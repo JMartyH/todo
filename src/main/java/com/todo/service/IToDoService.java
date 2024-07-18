@@ -2,6 +2,7 @@ package com.todo.service;
 
 import com.todo.dto.ToDoRequestDto;
 import com.todo.dto.ToDoResponseDto;
+import com.todo.entity.ToDoEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -13,7 +14,7 @@ public interface IToDoService {
     ToDoResponseDto getToDoById(Long id);
     ToDoResponseDto getToDoByTitle(String title);
     List<ToDoResponseDto> getAllToDos();
-    Page<ToDoResponseDto> getAllToDosPage(Pageable pageable);
+    Page<ToDoResponseDto> getAllToDosPage(ToDoEntity.Status status, Pageable pageable);
     ToDoResponseDto updateToDo(Long id, ToDoRequestDto toDoRequestDto);
     void deleteToDo(Long id);
 

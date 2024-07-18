@@ -2,6 +2,7 @@ package com.todo.controller;
 
 import com.todo.dto.ToDoRequestDto;
 import com.todo.dto.ToDoResponseDto;
+import com.todo.entity.ToDoEntity;
 import com.todo.service.IToDoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,10 +48,11 @@ public class ToDoController {
 //    }
 
     @GetMapping
-    public ResponseEntity<Page<ToDoResponseDto>> getAllToDosPage(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<Page<ToDoResponseDto>> getAllToDosPage(@RequestParam(required = false) ToDoEntity.Status status,
+                                                                 @RequestParam(defaultValue = "0") int page,
                                                                  @RequestParam(defaultValue = "10") int size){
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(toDoService.getAllToDosPage(pageable));
+        return ResponseEntity.ok(toDoService.getAllToDosPage(status, pageable));
     }
 
     @PutMapping("/{id}")

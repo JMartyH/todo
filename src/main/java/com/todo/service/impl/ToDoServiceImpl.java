@@ -64,10 +64,18 @@ public class ToDoServiceImpl implements IToDoService {
     }
 
     @Override
-    public Page<ToDoResponseDto> getAllToDosPage(Pageable pageable){
-        return toDoRepository.findAll(pageable)
+    public Page<ToDoResponseDto> getAllToDosPage(ToDoEntity.Status status, Pageable pageable){
+        Page<ToDoEntity> todos;
+        if (status == null) {
+            todos = toDoRepository.findAll(pageable);
+        } else {
+            todos = toDoRepository.findByStatus(status, pageable);
+        }
+
+        return todos
                 .map(toDoEntity -> toDoMapper.toDoToToDoResponseDto(toDoEntity));
     }
+
 
     @Override
     public ToDoResponseDto updateToDo(Long id, ToDoRequestDto toDoRequestDto) {
