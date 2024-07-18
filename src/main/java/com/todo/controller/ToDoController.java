@@ -5,6 +5,9 @@ import com.todo.dto.ToDoResponseDto;
 import com.todo.service.IToDoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,9 +41,16 @@ public class ToDoController {
         return ResponseEntity.ok(toDoService.getToDoByTitle(title));
     }
 
+//    @GetMapping
+//    public ResponseEntity<List<ToDoResponseDto>> getAllToDos(){
+//        return ResponseEntity.ok(toDoService.getAllToDos());
+//    }
+
     @GetMapping
-    public ResponseEntity<List<ToDoResponseDto>> getAllToDos(){
-        return ResponseEntity.ok(toDoService.getAllToDos());
+    public ResponseEntity<Page<ToDoResponseDto>> getAllToDosPage(@RequestParam(defaultValue = "0") int page,
+                                                                 @RequestParam(defaultValue = "10") int size){
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(toDoService.getAllToDosPage(pageable));
     }
 
     @PutMapping("/{id}")
