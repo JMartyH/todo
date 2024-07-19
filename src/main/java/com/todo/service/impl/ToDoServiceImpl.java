@@ -8,6 +8,8 @@ import com.todo.repository.ToDoRepository;
 import com.todo.service.IToDoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ public class ToDoServiceImpl implements IToDoService {
     private final ToDoRepository toDoRepository;
     private final ToDoMapper toDoMapper;
 
+    @CacheEvict(value = "todos", allEntries = true)
     @Override
     public ToDoResponseDto createToDo(ToDoRequestDto toDoRequestDto) {
         ToDoEntity toDoEntity = new ToDoEntity();
@@ -62,7 +65,7 @@ public class ToDoServiceImpl implements IToDoService {
                 .map(toDoEntity -> toDoMapper.toDoToToDoResponseDto(toDoEntity))
                 .toList();
     }
-
+    @Cacheable(value = "todos", key = "#pageable.pageNumber + '-' + #pageable.pageSize + '-' + #status")
     @Override
     public Page<ToDoResponseDto> getAllToDosPage(ToDoEntity.Status status, Pageable pageable){
         Page<ToDoEntity> todos;
@@ -76,7 +79,7 @@ public class ToDoServiceImpl implements IToDoService {
                 .map(toDoEntity -> toDoMapper.toDoToToDoResponseDto(toDoEntity));
     }
 
-
+    //TODO: Might also add cache invalidation here
     @Override
     public ToDoResponseDto updateToDo(Long id, ToDoRequestDto toDoRequestDto) {
 
@@ -93,6 +96,7 @@ public class ToDoServiceImpl implements IToDoService {
         return toDoMapper.toDoToToDoResponseDto(toDoEntity);
     }
 
+    //TODO: Might also add cache invalidation here
     @Override
     public void deleteToDo(Long id) {
         ToDoEntity toDoEntity = toDoRepository.findById(id).orElseThrow(() -> new RuntimeException("asd")); // Change exception
