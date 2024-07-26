@@ -86,6 +86,7 @@ public class ToDoServiceImpl implements IToDoService {
     }
 
     //TODO: Might also add cache invalidation here
+    @CacheEvict(value = "todos", allEntries = true)
     @Override
     public ToDoResponseDto updateToDo(Long id, ToDoRequestDto toDoRequestDto) {
 
@@ -103,6 +104,7 @@ public class ToDoServiceImpl implements IToDoService {
     }
 
     //TODO: Might also add cache invalidation here
+    @CacheEvict(value = "todos", allEntries = true)
     @Override
     public void deleteToDo(Long id) {
         ToDoEntity toDoEntity = toDoRepository.findById(id).orElseThrow(() -> new RuntimeException("asd")); // Change exception
