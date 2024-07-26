@@ -79,6 +79,12 @@ public class ToDoServiceImpl implements IToDoService {
                 .map(toDoEntity -> toDoMapper.toDoToToDoResponseDto(toDoEntity));
     }
 
+    @Override
+    public Page<ToDoResponseDto> searchToDos(String keyword, ToDoEntity.Status status, Pageable pageable) {
+        Page<ToDoEntity> toDoEntities = toDoRepository.searchToDos(keyword, status, pageable);
+        return toDoEntities.map(toDoEntity -> toDoMapper.toDoToToDoResponseDto(toDoEntity));
+    }
+
     //TODO: Might also add cache invalidation here
     @Override
     public ToDoResponseDto updateToDo(Long id, ToDoRequestDto toDoRequestDto) {

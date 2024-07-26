@@ -55,6 +55,18 @@ public class ToDoController {
         return ResponseEntity.ok(toDoService.getAllToDosPage(status, pageable));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<Page<ToDoResponseDto>> searchToDos(
+            @RequestParam String keyword,
+            @RequestParam(required = false) ToDoEntity.Status status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ToDoResponseDto> searchResults = toDoService.searchToDos(keyword, status, pageable);
+        return ResponseEntity.ok(searchResults);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<ToDoResponseDto> updateToDo(@PathVariable Long id, @RequestBody ToDoRequestDto toDoRequestDto){
         return ResponseEntity.ok(toDoService.updateToDo(id, toDoRequestDto));

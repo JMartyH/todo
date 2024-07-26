@@ -15,6 +15,7 @@ public interface IToDoService {
     ToDoResponseDto getToDoByTitle(String title);
     List<ToDoResponseDto> getAllToDos();
     Page<ToDoResponseDto> getAllToDosPage(ToDoEntity.Status status, Pageable pageable);
+    Page<ToDoResponseDto> searchToDos(String keyword, ToDoEntity.Status status, Pageable pageable);
     ToDoResponseDto updateToDo(Long id, ToDoRequestDto toDoRequestDto);
     void deleteToDo(Long id);
 
