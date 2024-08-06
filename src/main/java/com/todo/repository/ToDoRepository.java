@@ -15,6 +15,16 @@ public interface ToDoRepository extends JpaRepository<ToDoEntity, Long>{
 
     Optional<ToDoEntity> getByTitle(String title);
 
+    @Query("SELECT t FROM ToDoEntity t " +
+            "ORDER BY CASE " +
+            "   WHEN t.status = 'PENDING' THEN 1 " +
+            "   WHEN t.status = 'COMPLETED' THEN 2 " +
+            "   WHEN t.status = 'CANCELLED' THEN 3 " +
+            "   ELSE 4 " +
+            "END," +                  // End of CASE for status
+            " t.title ASC")            // Sort by title in ascending order
+    Page<ToDoEntity> findAllSorted(Pageable pageable);
+
     Page<ToDoEntity> findByStatus(ToDoEntity.Status status, Pageable pageable);
 
     @Query("SELECT t FROM ToDoEntity t " +

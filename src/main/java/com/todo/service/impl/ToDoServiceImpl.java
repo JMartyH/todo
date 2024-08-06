@@ -11,8 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,6 +28,7 @@ public class ToDoServiceImpl implements IToDoService {
     private final ToDoRepository toDoRepository;
     private final ToDoMapper toDoMapper;
 
+    @Transactional
     @CacheEvict(value = "todos", allEntries = true)
     @Override
     public ToDoResponseDto createToDo(ToDoRequestDto toDoRequestDto) {
@@ -69,10 +72,16 @@ public class ToDoServiceImpl implements IToDoService {
     @Override
     public Page<ToDoResponseDto> getAllToDosPage(ToDoEntity.Status status, Pageable pageable){
         Page<ToDoEntity> todos;
-        if (status == null) {
-            todos = toDoRepository.findAll(pageable);
-        } else {
-            todos = toDoRepository.findByStatus(status, pageable);
+
+        // Always use findAllSorted for fetching (regardless of status)
+        todos = toDoRepository.findAllSorted(pageable);
+
+        if (status != null) {
+            List<ToDoEntity> filteredList = todos.getContent().stream()
+                    .filter(todo -> todo.getStatus() == status)
+                    .toList();
+
+            todos = new PageImpl<>(filteredList, pageable, filteredList.size());
         }
 
         return todos
@@ -85,7 +94,6 @@ public class ToDoServiceImpl implements IToDoService {
         return toDoEntities.map(toDoEntity -> toDoMapper.toDoToToDoResponseDto(toDoEntity));
     }
 
-    //TODO: Might also add cache invalidation here
     @CacheEvict(value = "todos", allEntries = true)
     @Override
     public ToDoResponseDto updateToDo(Long id, ToDoRequestDto toDoRequestDto) {
@@ -94,7 +102,7 @@ public class ToDoServiceImpl implements IToDoService {
         log.info("Fetched todo: {}", toDoEntity.getId());
         toDoEntity.setTitle(toDoRequestDto.title());
         toDoEntity.setDescription(toDoRequestDto.description());
-        toDoEntity.setDueDate(toDoRequestDto.dueDate()); // TODO: Could cause error if user input is incorrect
+        toDoEntity.setDueDate(toDoRequestDto.dueDate()); // TODO: Could cause error if user input is incorrect | formatting
         toDoEntity.setStatus(toDoRequestDto.status());
         log.info("Attempting to save: {}", toDoRequestDto.title());
 
@@ -103,7 +111,6 @@ public class ToDoServiceImpl implements IToDoService {
         return toDoMapper.toDoToToDoResponseDto(toDoEntity);
     }
 
-    //TODO: Might also add cache invalidation here
     @CacheEvict(value = "todos", allEntries = true)
     @Override
     public void deleteToDo(Long id) {
