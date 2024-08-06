@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -34,4 +36,10 @@ public interface ToDoRepository extends JpaRepository<ToDoEntity, Long>{
     Page<ToDoEntity> searchToDos(@Param("keyword") String keyword,
                                  @Param("status") ToDoEntity.Status status,
                                  Pageable pageable);
+
+    @Query("SELECT t FROM ToDoEntity t WHERE t.dueDate BETWEEN :now AND :dueTime")
+    List<ToDoEntity> findToDosDueSoon(
+            @Param("now") LocalDateTime now,
+            @Param("dueTime") LocalDateTime dueTime
+    );
 }
